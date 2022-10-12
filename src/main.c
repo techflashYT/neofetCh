@@ -11,6 +11,8 @@
 #include <signal.h> // for debugging
 int main()
 {
+	// Move the cursor 42 characters to the right
+	printf("\x1b[42C");
 	struct utsname unamePointer;
 
 	uname(&unamePointer);
@@ -23,23 +25,24 @@ int main()
 
 	// Print "username@hostname"
 	printf("%s@%s\n", p->pw_name, hostname);
+	// Move cursor back to col 42
+	printf("\x1b[42C");
 
 	int lengthOfLine = 0;
 	lengthOfLine += strlen(p->pw_name) + strlen(hostname) + 1;
-//wrong window...
+
 	for (size_t i = 0; i < lengthOfLine; i++)
 	{
 		putchar('-');
 	}
-//you're good, talking in cursed-computing... well... attempting to lol
-//you're somehow switching my active window...
-
-//so ``strlen()`` itself is segfaulting?
+	putchar('\n');
+	// Move cursor back to col 42
+	printf("\x1b[42COS: ");
 	FILE* ptr;
 	size_t size;
 	ptr = fopen("/etc/os-release", "r");
 
-	// Allocat memory for the file
+	// Allocate memory for the file
 	char *fileBuffer = malloc(sizeof(char) * 1024);
 
 	// Zero out the memory
@@ -52,28 +55,48 @@ int main()
 
 	// Read the file
 	fread(fileBuffer, size, 1, ptr);
-
+	fclose(ptr);
 	char *osName = malloc(64);
+	memset(osName, '\0', 64);
 
-	char *ret = strstr(fileBuffer, "PRETTY_NAME=");
-	strcpy(osName, "Unkown");
-	char *ch = "\0\0";
-	if (ret != NULL)
+	char *subStrStart = strstr(fileBuffer, "PRETTY_NAME=");
+	if (subStrStart == NULL)
 	{
-		fseek(ptr, 12, SEEK_CUR);
-		strcpy(osName, "\0\0\0\0\0\0\0");
-		for (uint8_t i = 0; *(ch + i) != '\r' || *(ch + i) != '\n'; i++) {
-			fread(ch + i, 1, 1, ptr);
-			printf("address: 0x%x\r\ndref: %c\r\n\r\n", (ch + i), *(ch + i));
-			strcat(osName, (ch + i));
+		strcpy(osName, "Unkown");
+	}
+	else
+	{
+		subStrStart += 13; // ignore `PRETTY_NAME="`
+		for (uint16_t i = 0; subStrStart[i] != '\"'; i++) {
+			osName[i] = subStrStart[i];
 		}
 	}
 	
-	printf("\nOS: %s\n", osName);
-	printf("Kernel: %s", unamePointer.release); //why is this being skipped???????????????????????
-	// IDK hang on lets fix it hanging first
-	//wut....
-	
+	puts(osName);
 
+	free(osName);
+	// Move cursor back to col 42
+	printf("\x1b[42CKernel: %s\n", unamePointer.release);
+	printf("\x1b[42CUptime: ");
 
+	ptr = fopen("/proc/uptime", "r");
+
+	// Zero out the memory
+	memset(fileBuffer, '\0', sizeof(char) * 1024);
+
+	// Get file size
+	size = 32;
+
+	// Read the file
+	fread(fileBuffer, size, 1, ptr);
+	fclose(ptr);
+	uint8_t i = 0;
+	for (; fileBuffer[i] != ' '; i++) {
+
+	}
+	fileBuffer[i] = '\0';
+	double uptime = atof(fileBuffer);
+
+	printf("%.0f seconds\r\n", uptime);
+	free(fileBuffer);
 }
