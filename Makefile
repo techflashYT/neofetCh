@@ -1,6 +1,6 @@
 WARN   = -Wall -Wextra -Wstack-protector -Wformat=2 -Wformat-security
 FEATURE= -fdiagnostics-color=always -fstack-protector-all
-CFLAGS = $(WARN) $(FEATURE) -Isrc/include -Ofast -g -s -std=gnu2x
+CFLAGS = $(WARN) $(FEATURE) -Isrc/include -Ofast -g -s -std=gnu2x -pipe
 
 compile=\
 src/main.o
@@ -13,7 +13,7 @@ outFileName=neofetch
 .SUFFIXES: .o .c
 
 all: dirs $(compile)
-	@gcc $(link) $(CFLAGS) -o bin/$(outFileName)
+	@gcc -lm $(link) $(CFLAGS) -o bin/$(outFileName)
 	@echo "Built!"
 
 
