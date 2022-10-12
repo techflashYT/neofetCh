@@ -26,20 +26,17 @@ int main()
 
 	int lengthOfLine = 0;
 	lengthOfLine += strlen(p->pw_name) + strlen(hostname) + 1;
-//wrong window...
+
 	for (size_t i = 0; i < lengthOfLine; i++)
 	{
 		putchar('-');
 	}
-//you're good, talking in cursed-computing... well... attempting to lol
-//you're somehow switching my active window...
 
-//so ``strlen()`` itself is segfaulting?
 	FILE* ptr;
 	size_t size;
 	ptr = fopen("/etc/os-release", "r");
 
-	// Allocat memory for the file
+	// Allocate memory for the file
 	char *fileBuffer = malloc(sizeof(char) * 1024);
 
 	// Zero out the memory
@@ -70,10 +67,6 @@ int main()
 	}
 	
 	printf("\nOS: %s\n", osName);
-	printf("Kernel: %s", unamePointer.release); //why is this being skipped???????????????????????
-	// IDK hang on lets fix it hanging first
-	//wut....
-	
-
+	printf("Kernel: %s", unamePointer.release);
 
 }
