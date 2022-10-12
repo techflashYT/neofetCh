@@ -11,8 +11,8 @@
 #include <signal.h> // for debugging
 int main()
 {
-	// Move the cursor 7 lines down, 42 characters to the right
-	printf("\x1b[7B\x1b[42C");
+	// Move the cursor 42 characters to the right
+	printf("\x1b[42C");
 	struct utsname unamePointer;
 
 	uname(&unamePointer);
@@ -37,7 +37,7 @@ int main()
 	}
 	putchar('\n');
 	// Move cursor back to col 42
-	printf("\x1b[42C");
+	printf("\x1b[42COS: ");
 	FILE* ptr;
 	size_t size;
 	ptr = fopen("/etc/os-release", "r");
@@ -55,7 +55,7 @@ int main()
 
 	// Read the file
 	fread(fileBuffer, size, 1, ptr);
-
+	fclose(ptr);
 	char *osName = malloc(64);
 	memset(osName, '\0', 64);
 
@@ -72,9 +72,31 @@ int main()
 		}
 	}
 	
-	printf("OS: %s\n", osName);
-	// Move cursor back to col 42
-	printf("\x1b[42C");
-	printf("Kernel: %s\n", unamePointer.release);
+	puts(osName);
 
+	free(osName);
+	// Move cursor back to col 42
+	printf("\x1b[42CKernel: %s\n", unamePointer.release);
+	printf("\x1b[42CUptime: ");
+
+	ptr = fopen("/proc/uptime", "r");
+
+	// Zero out the memory
+	memset(fileBuffer, '\0', sizeof(char) * 1024);
+
+	// Get file size
+	size = 32;
+
+	// Read the file
+	fread(fileBuffer, size, 1, ptr);
+	fclose(ptr);
+	uint8_t i = 0;
+	for (; fileBuffer[i] != ' '; i++) {
+
+	}
+	fileBuffer[i] = '\0';
+	double uptime = atof(fileBuffer);
+
+	printf("%.0f seconds\r\n", uptime);
+	free(fileBuffer);
 }
