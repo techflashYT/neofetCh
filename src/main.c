@@ -51,23 +51,22 @@ int main()
 	fread(fileBuffer, size, 1, ptr);
 
 	char *osName = malloc(64);
+	memset(osName, '\0', 64);
 
-	char *ret = strstr(fileBuffer, "PRETTY_NAME=");
-	strcpy(osName, "Unkown");
-	char *ch = "\0\0";
-	if (ret != NULL)
+	char *subStrStart = strstr(fileBuffer, "PRETTY_NAME=");
+	if (subStrStart == NULL)
 	{
-		fseek(ptr, 12, SEEK_CUR);
-		strcpy(osName, "\0\0\0\0\0\0\0");
-		for (uint8_t i = 0; *(ch + i) != '\r' || *(ch + i) != '\n'; i++)
-		{
-			fread(ch + i, 1, 1, ptr);
-			printf("address: 0x%x\r\ndref: %c\r\n\r\n", (ch + i), *(ch + i));
-			strcat(osName, (ch + i));
+		strcpy(osName, "Unkown");
+	}
+	else
+	{
+		subStrStart += 13; // ignore `PRETTY_NAME="`
+		for (uint16_t i = 0; subStrStart[i] != '\"'; i++) {
+			osName[i] = subStrStart[i];
 		}
 	}
 	
 	printf("\nOS: %s\n", osName);
-	printf("Kernel: %s", unamePointer.release);
+	printf("Kernel: %s\n", unamePointer.release);
 
 }
