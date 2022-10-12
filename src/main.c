@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 
+#include <math.h>
+
 #include <signal.h> // for debugging
 int main()
 {
@@ -96,7 +98,49 @@ int main()
 	}
 	fileBuffer[i] = '\0';
 	double uptime = atof(fileBuffer);
+	double days = uptime;
+	double hours = uptime;
+	double minutes = uptime;
+	double seconds = uptime;
+	if ((((uptime / (double)60.0) / (double)60.0) / (double)24.0) < (double)1.0) {
+		if (((uptime / (double)60.0) / (double)60.0) < (double)1.0) {
+			// Less than 1m
+			if ((uptime / (double)60.0) < (double)1.0) {
+				printf("%.0f second%c\r\n", uptime, (uptime != 1) ? 's' : ' ');
+			}
+			// Less than 1h
+			else {
+				minutes = (uptime / (double)60.0);
+				double junk = 0;
+				seconds = modf(minutes, &junk);
+				seconds *= 60;
+				printf("%u minute%s, %u second%s\r\n", (uint32_t)floor(minutes), ((uint32_t)floor(minutes) != 1) ? "s" : "", (uint32_t)floor(seconds), ((uint32_t)floor(seconds) != 1) ? "s" : "");
+			}
+		}
+		else { // 1h+
+			hours = (((uptime / (double)60.0) / (double)60.0));
+			double junk = 0;
+			minutes = modf(hours, &junk);
+			minutes *= 60;
+			junk = 0;
+			seconds = modf(minutes, &junk);
+			seconds *= 60;
+			printf("%u hour%s, %u minute%s, %u second%s\r\n", (uint32_t)floor(hours), ((uint32_t)floor(hours) != 1) ? "s" : "", (uint32_t)floor(minutes), ((uint32_t)floor(minutes) != 1) ? "s" : "", (uint32_t)floor(seconds), ((uint32_t)floor(seconds) != 1) ? "s" : "");
+		}
+	}
+	else { // 1 day+
+		days = ((((uptime / (double)60.0) / (double)60.0)) / (double)24.0);
+		double junk = 0;
+		hours = modf(days, &junk);
+		hours *= 24;
+		junk = 0;
+		minutes = modf(hours, &junk);
+		minutes *= 60;
+		junk = 0;
+		seconds = modf(minutes, &junk);
+		seconds *= 60;
+		printf("%u day%s, %u hour%s, %u minute%s, %u second%s\r\n", (uint32_t)floor(days), ((uint32_t)floor(days) != 1) ? "s" : "", (uint32_t)floor(hours), ((uint32_t)floor(hours) != 1) ? "s" : "", (uint32_t)floor(minutes), ((uint32_t)floor(minutes) != 1) ? "s" : "", (uint32_t)floor(seconds), ((uint32_t)floor(seconds) != 1) ? "s" : "");
+	}
 
-	printf("%.0f seconds\r\n", uptime);
 	free(fileBuffer);
 }
