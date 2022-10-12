@@ -11,6 +11,8 @@
 #include <signal.h> // for debugging
 int main()
 {
+	// Move the cursor 7 lines down, 42 characters to the right
+	printf("\x1b[7B\x1b[42C");
 	struct utsname unamePointer;
 
 	uname(&unamePointer);
@@ -23,6 +25,8 @@ int main()
 
 	// Print "username@hostname"
 	printf("%s@%s\n", p->pw_name, hostname);
+	// Move cursor back to col 42
+	printf("\x1b[42C");
 
 	int lengthOfLine = 0;
 	lengthOfLine += strlen(p->pw_name) + strlen(hostname) + 1;
@@ -31,7 +35,9 @@ int main()
 	{
 		putchar('-');
 	}
-
+	putchar('\n');
+	// Move cursor back to col 42
+	printf("\x1b[42C");
 	FILE* ptr;
 	size_t size;
 	ptr = fopen("/etc/os-release", "r");
@@ -66,7 +72,9 @@ int main()
 		}
 	}
 	
-	printf("\nOS: %s\n", osName);
+	printf("OS: %s\n", osName);
+	// Move cursor back to col 42
+	printf("\x1b[42C");
 	printf("Kernel: %s\n", unamePointer.release);
 
 }
