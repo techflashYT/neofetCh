@@ -59,7 +59,8 @@ int main()
 	{
 		fseek(ptr, 12, SEEK_CUR);
 		strcpy(osName, "\0\0\0\0\0\0\0");
-		for (uint8_t i = 0; *(ch + i) != '\r' || *(ch + i) != '\n'; i++) {
+		for (uint8_t i = 0; *(ch + i) != '\r' || *(ch + i) != '\n'; i++)
+		{
 			fread(ch + i, 1, 1, ptr);
 			printf("address: 0x%x\r\ndref: %c\r\n\r\n", (ch + i), *(ch + i));
 			strcat(osName, (ch + i));
